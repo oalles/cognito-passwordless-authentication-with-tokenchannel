@@ -1,0 +1,137 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  A  Custom Passwordless Authentication Flow implementation in Cognito using TokenChannel.io. Send tokens by SMS, VOICE, WHATSAPP, EMAIL and 14 languages available.
+
+Metadata:
+  AWS::ServerlessRepo::Application:
+    Name: cognito-passwordless-authentication-with-tokenchannel
+    Description: >
+      A  Custom Passwordless Authentication Flow implementation in Cognito using TokenChannel.io. Send tokens by SMS, VOICE, WHATSAPP, EMAIL and 14 languages available.
+    Author: TokenChannel
+    SpdxLicenseId: MIT-0
+    LicenseUrl: LICENSE
+    ReadmeUrl: README.md
+    Labels: ["cognito", "passwordless", "authentication", "auth", "sms","whatsapp","telegram","voice","call","email","mfa","2fa"]
+    HomepageUrl: https://github.com/oalles/cognito-passwordless-authentication-with-tokenchannel
+    SourceCodeUrl: https://github.com/oalles/cognito-passwordless-authentication-with-tokenchannel
+
+Globals:
+  Function:
+    Timeout: 10
+
+Parameters:
+  UserPoolName:
+    Type: String
+    Description: The name for the User Pool
+  TCLanguage:
+    Type: String
+    Description: Tokenchannel - Default language for token notifications
+  TCChannel:
+    Type: String
+    Description: TokenChannel - Default channel to send the notifications
+  TCApiKey:
+    Type: String
+    Description: TokenChannel -Account api key
+  TCTestMode:
+    Type: String
+    Description: TC - whether test mode is enabled. Delivery is mocked, and api can be used to retrieve otp token
+
+Resources:
+  DefineAuthChallenge:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda-triggers/define-auth-challenge/
+      Handler: define-auth-challenge.handler
+      Runtime: nodejs14.x
+
+  CreateAuthChallenge:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda-triggers/create-auth-challenge/
+      Handler: create-auth-challenge.handler
+      Runtime: nodejs14.x
+      Environment:
+        Variables:
+          TOKENCHANNEL_LANGUAGE: !Ref TCLanguage
+          TOKENCHANNEL_API_KEY: !Ref TCApiKey
+          TOKENCHANNEL_CHANNEL: !Ref TCChannel
+          TOKENCHANNEL_TEST_MODE: !Ref TCTestMode
+
+  VerifyAuthChallengeResponse:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda-triggers/verify-auth-challenge-response/
+      Handler: verify-auth-challenge-response.handler
+      Runtime: nodejs14.x
+      Environment:
+        Variables:
+          TOKENCHANNEL_API_KEY: !Ref TCApiKey
+
+  UserPool:
+    Type: "AWS::Cognito::UserPool"
+    Properties:
+      UserPoolName: !Ref UserPoolName
+      Schema:
+        - Name: phone_number
+          AttributeDataType: String
+          Mutable: true
+          Required: true
+        - Name: locale
+          AttributeDataType: String
+          Mutable: true
+          Required: false
+        - Name: channel
+          AttributeDataType: String
+          Mutable: true
+          Required: false
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: false
+          RequireNumbers: false
+          RequireSymbols: false
+          RequireUppercase: false
+      UsernameAttributes:
+        - phone_number
+      MfaConfiguration: "OFF"
+      LambdaConfig:
+        CreateAuthChallenge: !GetAtt CreateAuthChallenge.Arn
+        DefineAuthChallenge: !GetAtt DefineAuthChallenge.Arn
+        VerifyAuthChallengeResponse: !GetAtt VerifyAuthChallengeResponse.Arn
+
+  DefineAuthChallengeInvocationPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt DefineAuthChallenge.Arn
+      Principal: cognito-idp.amazonaws.com
+      SourceArn: !GetAtt UserPool.Arn
+  CreateAuthChallengeInvocationPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt CreateAuthChallenge.Arn
+      Principal: cognito-idp.amazonaws.com
+      SourceArn: !GetAtt UserPool.Arn
+  VerifyAuthChallengeResponseInvocationPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt VerifyAuthChallengeResponse.Arn
+      Principal: cognito-idp.amazonaws.com
+      SourceArn: !GetAtt UserPool.Arn
+
+  UserPoolClient:
+    Type: "AWS::Cognito::UserPoolClient"
+    Properties:
+      ClientName: auth-client
+      GenerateSecret: false
+      UserPoolId: !Ref UserPool
+      ExplicitAuthFlows:
+        - CUSTOM_AUTH_FLOW_ONLY
+
+Outputs:
+  UserPoolClientId:
+    Description: ID of the User Pool Client
+    Value: !Ref UserPoolClient

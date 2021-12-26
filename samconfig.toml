@@ -1,0 +1,9 @@
+version = 0.1
+[default.global.parameters]
+stack_name = "tokenchannel-auth-flow"
+s3_bucket = "tokenchannel"
+s3_prefix = "cognito-passwordless-authentication"
+region = "eu-central-1"
+[default.deploy.parameters]
+confirm_changeset = false
+capabilities = "CAPABILITY_IAM"

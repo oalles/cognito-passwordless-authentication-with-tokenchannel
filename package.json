@@ -1,0 +1,23 @@
+{
+  "name": "cognito-passwordless-authentication-with-tokenchannel",
+  "version": "1.0.0",
+  "description": "Passwordless Authentication Flow in Cognito with TokenChannel.io",
+  "main": "index.js",
+  "scripts": {
+    "postinstall": "cd lambda-triggers/create-auth-challenge && yarn install && cd - && cd ./lambda-triggers/verify-auth-challenge-response && yarn install && cd -",
+    "env-ready": "if [ -e ${USER_POOL_NAME} ] || [ -e ${TOKENCHANNEL_API_KEY} ] || [ -e ${TOKENCHANNEL_CHANNEL} ] || [ -e ${TOKENCHANNEL_LANGUAGE} ] || [ -e ${TOKENCHANNEL_TEST_MODE} ]; then exit 1; fi",
+    "package": "tsc && sam package --config-file samconfig.toml --template-file template.yaml --output-template-file packaged.yaml",
+    "deploy": "sam deploy --config-file samconfig.toml --template-file packaged.yaml --parameter-overrides UserPoolName=${USER_POOL_NAME} TCApiKey=${TOKENCHANNEL_API_KEY} TCChannel=${TOKENCHANNEL_CHANNEL} TCLanguage=${TOKENCHANNEL_LANGUAGE} TCTestMode=${TOKENCHANNEL_TEST_MODE}",
+    "go": "npm run env-ready && npm run package && npm run deploy",
+    "publish-to-repo": "npm run package && sam publish --config-file samconfig.toml -t packaged.yaml"
+  },
+  "keywords": ["cognito", "passwordless", "authentication", "auth", "sms","whatsapp","telegram","voice","call","email","mfa","2fa"],
+  "author": "oalles@neivi.es",
+  "license": "MIT",
+  "dependencies": {
+    "@types/aws-lambda": "^8.10.88",
+    "@types/node": "^14.18.2",
+    "tokenchannel": "^0.13.0",
+    "typescript": "^4.5.4"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "create-auth-challenge",
+  "version": "1.0.0",
+  "description": "Determines the next challenge in a custom auth flow\n",
+  "main": "create-auth-challenge.js",
+  "license": "MIT",
+  "dependencies": {
+    "tokenchannel": "^0.13.0"
+  }
+}

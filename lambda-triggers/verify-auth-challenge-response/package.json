@@ -1,0 +1,10 @@
+{
+  "name": "verify-auth-challenge",
+  "version": "1.0.0",
+  "description": "Determines if a response is correct in a custom auth flow",
+  "main": "verify-auth-challenge.js",
+  "license": "MIT",
+  "dependencies": {
+    "tokenchannel": "^0.13.0"
+  }
+}

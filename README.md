@@ -5,7 +5,7 @@
 
 # [AWS Serverless Application](https://aws.amazon.com/serverless/sam/) providing:
 
-* An Amazon Cognito User Pool, with a custom workflow to provide a passwordless an authentication flow using TokenChannel
+* An Amazon Cognito User Pool, with a custom workflow to provide a passwordless authentication flow using TokenChannel
 * An Amazon Cognito User Pool Client, so we can start integrating the User Pool
 * The Lambda functions that will be triggered during user pool authentication operations
 * The lambda invocation permissions on the Lambda functions for the User Pool
@@ -19,7 +19,7 @@
 * A bucket created in [AWS S3](https://s3.console.aws.amazon.com/s3/home) and its name set in [sam configuration file](samconfig.toml)
 
 ```bash
-# Review and load the env variables !!Hide credentials
+# Review and load the env variables. !!Hide credentials
 export $(xargs < environment.env)
 
 yarn install
@@ -29,6 +29,10 @@ npm run go
 
 # Copy UserPoolClientId in the output - Will be needed for integration
 ```
+
+## Introduction
+
+Watch the [video introduction](https://youtu.be/_C5AmKfJTLo).
 
 ## Links
 

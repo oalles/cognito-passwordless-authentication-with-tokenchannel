@@ -1,7 +1,5 @@
 ![Diagram](diagram.png)
 
-[![Try with Postman](https://run.pstmn.io/button.svg)](https://www.getpostman.com/collections/6341f2799654255c9b1a)
-
 
 # [AWS Serverless Application](https://aws.amazon.com/serverless/sam/) providing:
 
@@ -33,6 +31,14 @@ npm run go
 ## Introduction
 
 Watch the [video introduction](https://youtu.be/_C5AmKfJTLo).
+
+## Postman collections
+
+#### TokenChannel Cognito Playground
+[![Try with Postman](https://run.pstmn.io/button.svg)](https://www.getpostman.com/collections/6341f2799654255c9b1a) 
+
+####  TokenChannel Api Collection
+[![Try with Postman](https://run.pstmn.io/button.svg)](https://www.getpostman.com/collections/6341f2799654255c9b1a)
 
 ## Links
 
